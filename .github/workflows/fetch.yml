@@ -1,0 +1,18 @@
+name: Fetch upstream
+on: 
+    schedule:
+        - cron: '0 7 * * 1'
+    workflow_dispatch:
+jobs:
+    fetch:
+        name: Fetch upstream
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout local
+              uses: actions/checkout@v3
+            - name: Pull
+              run: |
+                git checkout main
+                git pull https://android.googlesource.com/kernel/build main --ff-only --no-tags
+                git push
+
