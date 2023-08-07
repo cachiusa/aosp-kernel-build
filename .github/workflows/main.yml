@@ -10,9 +10,10 @@ jobs:
         steps:
             - name: Checkout local
               uses: actions/checkout@v3
+              with:
+                ref: main
+                fetch-depth: 0
             - name: Pull
               run: |
-                git checkout main
                 git pull https://android.googlesource.com/kernel/build main --ff-only --no-tags
                 git push
-
