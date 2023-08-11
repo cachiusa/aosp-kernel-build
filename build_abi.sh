@@ -114,33 +114,6 @@ case $i in
 esac
 done
 
-(
-    [[ "$KLEAF_SUPPRESS_BUILD_SH_DEPRECATION_WARNING" == "1" ]] && exit 0 || true
-    echo     "Inferring equivalent Bazel command..."
-    bazel_command_code=0
-    eq_bazel_command=$(
-        export UPDATE
-        export UPDATE_SYMBOL_LIST
-        export DIFF
-        ${ROOT_DIR}/build/kernel/kleaf/convert_to_bazel.sh --abi # error messages goes to stderr
-    ) || bazel_command_code=$?
-    echo     "*******************************************************************************" >&2
-    echo     "* WARNING: build_abi.sh is deprecated for this branch. Please migrate to Bazel." >&2
-    echo     "*   See build/kernel/kleaf/README.md                                           " >&2
-    if [[ $bazel_command_code -eq 0 ]]; then
-        echo "*          Possibly equivalent Bazel command:                                  " >&2
-        echo "*" >&2
-        echo "*   \$ $eq_bazel_command" >&2
-        echo "*" >&2
-    else
-        echo "WARNING: Unable to infer an equivalent Bazel command." >&2
-    fi
-    echo     "* To suppress this warning, set KLEAF_SUPPRESS_BUILD_SH_DEPRECATION_WARNING=1  " >&2
-    echo     "*******************************************************************************" >&2
-    echo >&2
-)
-export KLEAF_SUPPRESS_BUILD_SH_DEPRECATION_WARNING=1
-
 set -- "${ARGS[@]}"
 
 set -e
