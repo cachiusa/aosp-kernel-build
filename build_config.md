@@ -1,37 +1,56 @@
-# The following environment variables are considered during execution:
+# Typical build options
+## ARCH
+A target architecture to pass to Make, typically: arm64, x86 etc.
 
-## BUILD_CONFIG
-Build config file to initialize the build environment from. The location
-is to be defined relative to the repo root directory.
-Defaults to 'build.config'.
-
-## BUILD_CONFIG_FRAGMENTS
-A whitespace-separated list of additional build config fragments to be
-sourced after the main build config file. Typically used for sanitizers or
-other special builds.
-
-## FAST_BUILD
-If defined, trade run-time optimizations for build speed. In other words,
-if given a choice between a faster build and a run-time optimization,
-choose the shorter build time. For example, use ThinLTO for faster
-linking and reduce the lz4 compression level to speed up ramdisk
-compression. This trade-off is desirable for incremental kernel
-development where fast turnaround times are critical for productivity.
-
-## OUT_DIR
-Base output directory for the kernel build.
-Defaults to <REPO_ROOT>/out/<BRANCH>.
-
-## DIST_DIR
-Base output directory for the kernel distribution.
-Defaults to <OUT_DIR>/dist
+## CC
+Override compiler to be used. (e.g. CC=clang)  
+Specifying CC=gcc effectively unsets CC to fall back to the default gcc detected by kbuild (including any target triplet).  
+To use a custom 'gcc' from PATH, use an absolute path, e.g. CC=/usr/local/bin/gcc
 
 ## MAKE_GOALS
 List of targets passed to Make when compiling the kernel.
 Typically: Image, modules, and a DTB (if applicable).
 
+## FILES
+List of files (relative to [OUT_DIR](#out_dir)) copied to [DIST_DIR](#dist_dir) after building the kernel.   
+
+## LTO=[ full | thin | none ]
+- If set to "full", force any kernel with LTO_CLANG support to be built with full LTO, which is the most optimized method. This is the default, but can result in very slow build times, especially when building incrementally. (This mode does not require CFI to be disabled.)
+- If set to "thin", force any kernel with LTO_CLANG support to be built with ThinLTO, which trades off some optimizations for incremental build speed. This is nearly always what you want for local development. (This mode does not require CFI to be disabled.)
+- If set to "none", force any kernel with LTO_CLANG support to be built without any LTO (upstream default), which results in no optimizations and also disables LTO-dependent features like CFI. This mode is not recommended because CFI will not be able to catch bugs if it is disabled.
+
+# The following environment variables are considered during execution:
+
+## BUILD_CONFIG
+Build config file to initialize the build environment from.  
+The location is to be defined relative to the repo root directory.
+Defaults to `build.config`.
+
+## BUILD_CONFIG_FRAGMENTS
+A whitespace-separated list of additional build config fragments to be sourced after the main build config file. Typically used for sanitizers or other special builds.
+
+## FAST_BUILD
+If defined, trade run-time optimizations for build speed. In other words, if given a choice between a faster build and a run-time optimization, choose the shorter build time.  
+For example, use ThinLTO for faster linking and reduce the lz4 compression level to speed up ramdisk compression.  
+This trade-off is desirable for incremental kernel development where fast turnaround times are critical for productivity.
+
+Setting this option is also equivalent to:  
+```
+LTO=thin
+LZ4_RAMDISK_COMPRESS_ARGS="--fast"
+SKIP_CP_KERNEL_HDR=1
+``` 
+
+## OUT_DIR
+Base output directory for the kernel build.
+Defaults to `<REPO_ROOT>/out/<BRANCH>`.
+
+## DIST_DIR
+Base output directory for the kernel distribution.
+Defaults to `<OUT_DIR>/dist`
+
 ## EXT_MODULES
-Space separated list of external kernel modules to be build.
+Space-separated list of external kernel modules to be build.
 
 ## EXT_MODULES_MAKEFILE
 Location of a makefile to build external modules. If set, it will get
@@ -49,15 +68,12 @@ used to set configs for external modules in the defconfig.
 Space separated list of modules to be copied to <DIST_DIR>/unstripped
 for debugging purposes.
 
-COMPRESS_UNSTRIPPED_MODULES
+## COMPRESS_UNSTRIPPED_MODULES
 If set to "1", then compress the unstripped modules into a tarball.
 
 ## COMPRESS_MODULES
 If set to "1", then compress all modules into a tarball. The default
 is without defining COMPRESS_MODULES.
-
-## LD
-Override linker (flags) to be used.
 
 ## HERMETIC_TOOLCHAIN
 When set, the PATH during kernel build will be restricted to a set of
@@ -94,8 +110,6 @@ If set to "1", generate a vmlinux.btf that is stripped of any debug
 symbols, but contains type and symbol information within a .BTF section.
 This is suitable for ABI analysis through BTF.
 
-# Environment variables to influence the stages of the kernel build
-
 ## SKIP_MRPROPER
 if set to "1", skip `make mrproper`
 
@@ -117,11 +131,6 @@ Command evaluated after `make defconfig` and before `make`.
 
 ## POST_KERNEL_BUILD_CMDS
 Command evaluated after `make`.
-
-## LTO=[ full | thin | none ]
-- If set to "full", force any kernel with LTO_CLANG support to be built with full LTO, which is the most optimized method. This is the default, but can result in very slow build times, especially when building incrementally. (This mode does not require CFI to be disabled.)
-- If set to "thin", force any kernel with LTO_CLANG support to be built with ThinLTO, which trades off some optimizations for incremental build speed. This is nearly always what you want for local development. (This mode does not require CFI to be disabled.)
-- If set to "none", force any kernel with LTO_CLANG support to be built without any LTO (upstream default), which results in no optimizations and also disables LTO-dependent features like CFI. This mode is not recommended because CFI will not be able to catch bugs if it is disabled.
 
 ## TAGS_CONFIG
 if defined, calls ./scripts/tags.sh utility with TAGS_CONFIG as argument
@@ -148,58 +157,48 @@ if defined, skip installing kernel headers.
 
 ## BUILD_BOOT_IMG
 <details>
-<summary>
-Expand
-</summary>  
 
 If defined, build a boot.img binary that can be flashed into the 'boot' partition of an Android device.  
 The boot image contains a header as per the format defined by https://source.android.com/devices/bootloader/boot-image-header followed by several components like kernel, ramdisk, DTB etc.  
 The ramdisk component comprises of a GKI ramdisk cpio archive concatenated with a vendor ramdisk cpio archive which is then gzipped. It is expected that all components are present in ${DIST_DIR}.
 
-When the BUILD_BOOT_IMG flag is defined, the following flags that point to the
-various components needed to build a boot.img also need to be defined.
-- MKBOOTIMG_PATH=<path to the mkbootimg.py script which builds boot.img>  
+When the BUILD_BOOT_IMG flag is defined, the following flags that point to the various components needed to build a boot.img also need to be defined. 
+- MKBOOTIMG_PATH=`<path to the mkbootimg.py script which builds boot.img>`  
 (defaults to tools/mkbootimg/mkbootimg.py)
-- GKI_RAMDISK_PREBUILT_BINARY=<Name of the GKI ramdisk prebuilt which includes
-the generic ramdisk components like init and the non-device-specific rc files>
-- VENDOR_RAMDISK_BINARY= <space separated list of vendor ramdisk binaries which includes the device-specific components of ramdisk like the fstab file and the device-specific rc files. If specifying multiple vendor ramdisks and identical file paths exist in the ramdisks, the file from last ramdisk is used.>
-- KERNEL_BINARY=<name of kernel binary, eg. Image.lz4, Image.gz etc>
-- BOOT_IMAGE_HEADER_VERSION=<version of the boot image header>
-(defaults to 3)
-- BOOT_IMAGE_FILENAME=<name of the output file>
-(defaults to "boot.img")
-- KERNEL_CMDLINE=<string of kernel parameters for boot>
-- KERNEL_VENDOR_CMDLINE=<string of kernel parameters for vendor boot image,
-vendor_boot when BOOT_IMAGE_HEADER_VERSION >= 3; boot otherwise>
-- VENDOR_FSTAB=<Path to the vendor fstab to be included in the vendor
-ramdisk>
-- TAGS_OFFSET=<physical address for kernel tags>
-- RAMDISK_OFFSET=<ramdisk physical load address>
-If the BOOT_IMAGE_HEADER_VERSION is less than 3, two additional variables must
-be defined:
-- BASE_ADDRESS=<base address to load the kernel at>
+- GKI_RAMDISK_PREBUILT_BINARY=`<Name of the GKI ramdisk prebuilt which includes the generic ramdisk components like init and the non-device-specific rc files>`
+- VENDOR_RAMDISK_BINARY= `<space separated list of vendor ramdisk binaries which includes the device-specific components of ramdisk like the fstab file and the device-specific rc files.>`  
+If specifying multiple vendor ramdisks and identical file paths exist in the ramdisks, the file from last ramdisk is used.
+- KERNEL_BINARY=`<name of kernel binary, eg. Image.lz4, Image.gz etc>`
+- BOOT_IMAGE_HEADER_VERSION=`<version of the boot image header>` (defaults to 3)
+- BOOT_IMAGE_FILENAME=`<name of the output file>` (defaults to "boot.img")
+- KERNEL_CMDLINE=`<string of kernel parameters for boot>`
+- KERNEL_VENDOR_CMDLINE=`<string of kernel parameters for vendor boot image, vendor_boot when BOOT_IMAGE_HEADER_VERSION >= 3; boot otherwise>`
+- VENDOR_FSTAB=`<Path to the vendor fstab to be included in the vendor ramdisk>`
+- TAGS_OFFSET=`<physical address for kernel tags>`
+- RAMDISK_OFFSET=`<ramdisk physical load address>`
+If the BOOT_IMAGE_HEADER_VERSION is less than 3, two additional variables must be defined:
+- BASE_ADDRESS=`<base address to load the kernel at>`
 - PAGE_SIZE=<flash page size>  
-If BOOT_IMAGE_HEADER_VERSION >= 3, a vendor_boot image will be built unless SKIP_VENDOR_BOOT is defined. A vendor_boot will also be generated if BUILD_VENDOR_BOOT_IMG is set.
+If BOOT_IMAGE_HEADER_VERSION >= 3, a vendor_boot image will be built unless `SKIP_VENDOR_BOOT` is defined. A vendor_boot will also be generated if `BUILD_VENDOR_BOOT_IMG` is set.
 
-BUILD_VENDOR_BOOT_IMG is incompatible with SKIP_VENDOR_BOOT, and is effectively a
-nop if BUILD_BOOT_IMG is set.
+`BUILD_VENDOR_BOOT_IMG` is incompatible with `SKIP_VENDOR_BOOT`, and is effectively a no-op if `BUILD_BOOT_IMG` is set.
 
-- MODULES_LIST=<file to list of modules>  
+- MODULES_LIST=`<file to list of modules>`  
 list of modules to use for vendor_boot.modules.load. If this property is not set, then the default modules.load is used.  
 - TRIM_UNUSED_MODULES  
 If set, then modules not mentioned in
 modules.load are removed from initramfs. If MODULES_LIST is unset, then
 having this variable set effectively becomes a no-op.
-- MODULES_BLOCKLIST=<modules.blocklist file>  
+- MODULES_BLOCKLIST=`<modules.blocklist file>`  
 A list of modules which are blocked from being loaded. This file is copied directly to staging directory, and should be in the format: `blocklist module_name`
 - MKBOOTIMG_EXTRA_ARGS=<space-delimited mkbootimg arguments>  
-Refer to: ./mkbootimg.py --help  
+Refer to: `./mkbootimg.py --help`  
 
 If BOOT_IMAGE_HEADER_VERSION >= 4, the following variable can be defined:
-- VENDOR_BOOTCONFIG=<string of bootconfig parameters>  
-- INITRAMFS_VENDOR_RAMDISK_FRAGMENT_NAME=<name of the ramdisk fragment>
-If BUILD_INITRAMFS is specified, then build the .ko and depmod files as a standalone vendor ramdisk fragment named as the given string.
-- INITRAMFS_VENDOR_RAMDISK_FRAGMENT_MKBOOTIMG_ARGS=<mkbootimg arguments>  
+- VENDOR_BOOTCONFIG=`<string of bootconfig parameters>`  
+- INITRAMFS_VENDOR_RAMDISK_FRAGMENT_NAME`=<name of the ramdisk fragment>`  
+If `BUILD_INITRAMFS` is specified, then build the `.ko` and depmod files as a standalone vendor ramdisk fragment named as the given string.  
+- INITRAMFS_VENDOR_RAMDISK_FRAGMENT_MKBOOTIMG_ARGS=`<mkbootimg arguments>`  
 Refer to: https://source.android.com/devices/bootloader/partitions/vendor-boot-partitions#mkbootimg-arguments
 
 </details>  
@@ -212,21 +211,20 @@ If set, skip unpacking the vendor ramdisk and copy it as is, without
 modifications, into the boot image. Also skip the mkbootfs step.
 
 ## AVB_SIGN_BOOT_IMG
-if defined, sign the boot image using the AVB_BOOT_KEY. Refer to
-https://android.googlesource.com/platform/external/avb/+/master/README.md
-for details on what Android Verified Boot is and how it works. The kernel
-prebuilt tool `avbtool` is used for signing.
+<details>
+if defined, sign the boot image using the `AVB_BOOT_KEY`. Refer to
+https://android.googlesource.com/platform/external/avb/+/master/README.md for details on what Android Verified Boot is and how it works. The kernel prebuilt tool `avbtool` is used for signing.
 
 When AVB_SIGN_BOOT_IMG is defined, the following flags need to be defined:
-- AVB_BOOT_PARTITION_SIZE=<size of the boot partition in bytes>
-- AVB_BOOT_KEY=<absolute path to the key used for signing> The Android test
-key has been uploaded to the kernel/prebuilts/build-tools project here:
+- AVB_BOOT_PARTITION_SIZE=`<size of the boot partition in bytes>`
+- AVB_BOOT_KEY=`<absolute path to the key used for signing>`  
+The Android test key has been uploaded to the kernel/prebuilts/build-tools project here:  
 https://android.googlesource.com/kernel/prebuilts/build-tools/+/refs/heads/master/linux-x86/share/avb
-- AVB_BOOT_ALGORITHM=<AVB_BOOT_KEY algorithm used> e.g. SHA256_RSA2048. For the
-full list of supported algorithms, refer to the enum AvbAlgorithmType in
-https://android.googlesource.com/platform/external/avb/+/refs/heads/master/libavb/avb_crypto.h
-- AVB_BOOT_PARTITION_NAME=<name of the boot partition>
+- AVB_BOOT_ALGORITHM=`<AVB_BOOT_KEY algorithm used>` e.g. SHA256_RSA2048.  
+For the full list of supported algorithms, refer to the enum `AvbAlgorithmType` in https://android.googlesource.com/platform/external/avb/+/refs/heads/master/libavb/avb_crypto.h
+- AVB_BOOT_PARTITION_NAME=`<name of the boot partition>` 
 (defaults to BOOT_IMAGE_FILENAME without extension; by default, "boot")
+</details>
 
 ## BUILD_INITRAMFS
 if set to "1", build a ramdisk containing all .ko files and resulting depmod artifacts 
@@ -238,8 +236,7 @@ if set to "1", build a system_dlkm.img containing all signed GKI modules and res
 location (relative to the repo root directory) of an optional file containing the list of kernel modules which shall be copied into a system_dlkm partition image.
 
 ## MODULES_OPTIONS
-A `/lib/modules/modules.options` file is created on the ramdisk containing the contents of this variable, lines should be of the form: `options
-<modulename> <param1>=<val> <param2>=<val> ...`
+A `/lib/modules/modules.options` file is created on the ramdisk containing the contents of this variable, lines should be of the form: `options <modulename> <param1>=<val> <param2>=<val> ...`
 
 ## MODULES_ORDER
 location of an optional file containing the list of modules that are expected to be built for the current configuration, in the modules.order format, relative to the kernel source tree.
@@ -250,25 +247,24 @@ This should be set in downstream builds to ensure the ABI tooling correctly diff
 This should not be set in the upstream GKI build.config.
 
 ## VENDOR_DLKM_MODULES_LIST
-location (relative to the repo root directory) of an optional file
+Location (relative to the repo root directory) of an optional file
 containing the list of kernel modules which shall be copied into a
 vendor_dlkm partition image. Any modules passed into MODULES_LIST which
 become part of the vendor_boot.modules.load will be trimmed from the
 vendor_dlkm.modules.load.
 
 ## VENDOR_DLKM_MODULES_BLOCKLIST
-location (relative to the repo root directory) of an optional file
+Location (relative to the repo root directory) of an optional file
 containing a list of modules which are blocked from being loaded. This
 file is copied directly to the staging directory and should be in the
 format: blocklist module_name
 
 ## VENDOR_DLKM_PROPS
-location (relative to the repo root directory) of a text file containing the properties to be used for creation of a vendor_dlkm image (filesystem, partition size, etc).  
+Location (relative to the repo root directory) of a text file containing the properties to be used for creation of a vendor_dlkm image (filesystem, partition size, etc).  
 If this is not set (and VENDOR_DLKM_MODULES_LIST is), a default set of properties will be used which assumes an ext4 filesystem and a dynamic partition.
 
 ## LZ4_RAMDISK
-if set to "1", any ramdisks generated will be lz4 compressed instead of
-gzip compressed.
+If set to "1", any ramdisks generated will be lz4 compressed instead of gzip compressed.
 
 ## LZ4_RAMDISK_COMPRESS_ARGS
 Command line arguments passed to lz4 command to control compression
@@ -319,15 +315,15 @@ Image.lz4
 if defined, package a dtbo.img using the provided *.dtbo files. The image will be created under the DIST_DIR.
 
 The following flags control how the dtbo image is packaged:
-- MKDTIMG_DTBOS=<list of `*.dtbo` files> used to package the dtbo.img.  
-The*.dtbo files should be compiled by kbuild via the "make dtbs" command or by adding each *.dtbo to the MAKE_GOALS.  
-- MKDTIMG_FLAGS=<list of flags to be passed to mkdtimg.>
+- MKDTIMG_DTBOS=`<list of dtbo files>` used to package the dtbo.img.  
+The `*.dtbo` files should be compiled by kbuild via the "make dtbs" command or by adding each *.dtbo to the MAKE_GOALS.  
+- MKDTIMG_FLAGS=`<list of flags to be passed to mkdtimg.>`
 
 ## DTS_EXT_DIR
-Set this variable to compile an out-of-tree device tree. The value of this variable is set to the kbuild variable "dtstree" which is used to compile the device tree, it will be used to lookup files in FILES as well.  
-If this is set, then it's likely the dt-bindings are out-of-tree as well.  
-So be sure to set DTC_INCLUDE in the BUILD_CONFIG file to the include path containing the dt-bindings.  
-Update the MAKE_GOALS variable and the FILES variable to specify the target dtb files with the path under ${DTS_EXT_DIR}, so that they could be compiled and copied to the dist directory. Like the following:  
+Set this variable to compile an out-of-tree device tree.  
+The value of this variable is set to the kbuild variable "dtstree" which is used to compile the device tree, it will be used to lookup files in `FILES` as well.  
+If this is set, then it's likely the dt-bindings are out-of-tree as well. So be sure to set `DTC_INCLUDE` in the `BUILD_CONFIG` file to the include path containing the dt-bindings.  
+Update the `MAKE_GOALS` variable and the `FILES` variable to specify the target dtb files with the path under `${DTS_EXT_DIR}`, so that they could be compiled and copied to the dist directory. Like the following:  
 ```
 DTS_EXT_DIR=common-modules/virtual-device
 MAKE_GOALS="${MAKE_GOALS} k3399-rock-pi-4b.dtb"
@@ -337,31 +333,34 @@ where the dts file path is
 common-modules/virtual-device/rk3399-rock-pi-4b.dts
 
 ## BUILD_VENDOR_KERNEL_BOOT
-if set to "1", build a vendor_kernel_boot for kernel artifacts, such as kernel modules.  
+If set to "1", build a vendor_kernel_boot for kernel artifacts, such as kernel modules.  
 Since we design this partition to isolate kernel artifacts from vendor_boot image, vendor_boot would not be repack and built if we set this property to "1".
 
 ## BUILD_GKI_CERTIFICATION_TOOLS
-if set to "1", build a gki_certification_tools.tar.gz, which contains the utilities used to certify GKI boot-*.img files.
+If set to "1", build a gki_certification_tools.tar.gz, which contains the utilities used to certify GKI boot-*.img files.
 
-## BUILD_GKI_ARTIFACTS  
+## BUILD_GKI_ARTIFACTS 
+<details>
 - if defined when `$ARCH` is arm64, build a boot-img.tar.gz archive that contains several GKI `boot-*.img` files with different kernel compression format.  
 Each boot image contains a boot header v4 as per the format defined by https://source.android.com/devices/bootloader/boot-image-header, followed by a kernel (no ramdisk).  
 The kernel binaries are from `${DIST_DIR}`, e.g., Image, Image.gz, Image.lz4, etc.  
-Individual boot-*.img files are also generated, e.g., `boot.img`, `boot-gz.img` and `boot-lz4.img`. It is expected that all components are present in ${DIST_DIR}.  
+Individual boot-*.img files are also generated, e.g., `boot.img`, `boot-gz.img` and `boot-lz4.img`. It is expected that all components are present in `${DIST_DIR}`.  
 
 - if defined when `$ARCH` is x86_64, build a boot.img with the kernel image,
-bzImage under ${DIST_DIR}. Additionally, create an archive boot-img.tar.gz
+bzImage under `${DIST_DIR}`. Additionally, create an archive boot-img.tar.gz
 containing boot.img.
 
 - if defined when `$ARCH` is neither arm64 nor x86_64, print an error message then exist the build process.
 
-When the BUILD_GKI_ARTIFACTS flag is defined, the following flags also need to be defined.
-- MKBOOTIMG_PATH=<path to the mkbootimg.py script which builds boot.img>  
+When the **BUILD_GKI_ARTIFACTS** flag is defined, the following flags also need to be defined.
+- **MKBOOTIMG_PATH**=`<path to the mkbootimg.py script which builds boot.img>` 
 (defaults to tools/mkbootimg/mkbootimg.py)
-- BUILD_GKI_BOOT_IMG_SIZE=<The size of the boot.img to build>  
-This is required, and the file ${DIST_DIR}/Image must exist.
-- BUILD_GKI_BOOT_IMG_GZ_SIZE=<The size of the boot-gz.img to build>  
+- **BUILD_GKI_BOOT_IMG_SIZE**=`<The size of the boot.img to build>`   
+This is required, and the file ${DIST_DIR}/Image must exist. 
+- **BUILD_GKI_BOOT_IMG_GZ_SIZE**=`<The size of the boot-gz.img to build>`  
 This is required only when ${DIST_DIR}/Image.gz is present.
-- BUILD_GKI_BOOT_IMG_LZ4_SIZE=<The size of the boot-lz4.img to build>  
+- **BUILD_GKI_BOOT_IMG_LZ4_SIZE**=`<The size of the boot-lz4.img to build>`  
 This is required only when ${DIST_DIR}/Image.lz4 is present.  
-- BUILD_GKI_BOOT_IMG_<COMPRESSION>_SIZE=<The size of the `boot-${compression}.img` to build> This is required only when `${DIST_DIR}/Image.${compression}` is present.
+- **BUILD_GKI_BOOT_IMG_<COMPRESSION>_SIZE**=`<The size of the boot-${compression}.img to build>`  
+This is required only when `${DIST_DIR}/Image.${compression}` is present.
+</details>
