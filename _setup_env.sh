@@ -232,6 +232,13 @@ else
   if [ -n "${OBJCOPY}" ]; then
     tool_args+=("OBJCOPY=${OBJCOPY}")
   fi
+
+  if [ -n "${AS}" ]; then
+    tool_args+=("AS=${AS}")
+  elif [[ "${AS}" == "llvm-as" ]]
+    echo "warn: AS=llvm-as is not recommended, changing to clang"
+    tool_args+=("AS=clang")
+  fi
 fi
 
 if [ -n "${LLVM_IAS}" ]; then
