@@ -82,11 +82,9 @@ export LC_ALL=C
 if [ -z "${SOURCE_DATE_EPOCH}" ]; then
   export SOURCE_DATE_EPOCH=$(git -C ${ROOT_DIR}/${KERNEL_DIR} log -1 --pretty=%ct)
 fi
-export KBUILD_BUILD_TIMESTAMP="$(date -d @${SOURCE_DATE_EPOCH})"
-export KBUILD_BUILD_HOST=build-host
-export KBUILD_BUILD_USER=build-user
-export KBUILD_BUILD_VERSION=1
-
+if [ -z "${KBUILD_BUILD_TIMESTAMP}" ]; then
+  export KBUILD_BUILD_TIMESTAMP="$(date -d @${SOURCE_DATE_EPOCH})"
+fi
 # List of prebuilt directories shell variables to incorporate into PATH
 prebuilts_paths=(
 LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN
