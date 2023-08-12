@@ -1007,3 +1007,21 @@ if key in js:
     echo "WARNING: Can't determine $what for $2" >&2
   fi
 }
+# verifies that defconfig matches the DEFCONFIG
+function check_defconfig() {
+    (cd ${OUT_DIR} && \
+     make ${TOOL_ARGS} O=${OUT_DIR} savedefconfig)
+    [ "$ARCH" = "x86_64" -o "$ARCH" = "i386" ] && local ARCH=x86
+    RES=0
+    if [[ -f ${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG} ]]; then
+      diff -u ${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG} ${OUT_DIR}/defconfig >&2 ||
+        RES=$?
+    else
+      diff -u ${OUT_DIR}/arch/${ARCH}/configs/${DEFCONFIG} ${OUT_DIR}/defconfig >&2 ||
+        RES=$?
+    fi
+    if [ ${RES} -ne 0 ]; then
+        echo ERROR: savedefconfig does not match ${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG} >&2
+    fi
+    return ${RES}
+}
