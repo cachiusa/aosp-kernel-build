@@ -624,6 +624,7 @@ if [ "${SKIP_DEFCONFIG}" != "1" ] ; then
   fi
 fi
 
+if [[ ! "${CC}" = *"gcc"* ]]; then
 if [ "${LTO}" = "none" -o "${LTO}" = "thin" -o "${LTO}" = "full" ]; then
   echo "========================================================"
   echo " Modifying LTO mode to '${LTO}'"
@@ -660,6 +661,7 @@ if [ "${LTO}" = "none" -o "${LTO}" = "thin" -o "${LTO}" = "full" ]; then
 elif [ -n "${LTO}" ]; then
   echo "LTO= must be one of 'none', 'thin' or 'full'."
   exit 1
+fi
 fi
 
 if [ -n "${TAGS_CONFIG}" ]; then
