@@ -205,42 +205,44 @@ if [ "${SKIP_DEFCONFIG}" != "1" ] ; then
   fi
 fi
 
-if [ "${LTO}" = "none" -o "${LTO}" = "thin" -o "${LTO}" = "full" ]; then
-  echo "========================================================"
-  echo " Modifying LTO mode to '${LTO}'"
+if [[ ! "${CC}" = *"gcc"* ]]; then
+  if [ "${LTO}" = "none" -o "${LTO}" = "thin" -o "${LTO}" = "full" ]; then
+    echo "========================================================"
+    echo " Modifying LTO mode to '${LTO}'"
 
-  set -x
-  if [ "${LTO}" = "none" ]; then
-    ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
-      -d LTO_CLANG \
-      -e LTO_NONE \
-      -d LTO_CLANG_THIN \
-      -d LTO_CLANG_FULL \
-      -d THINLTO \
-      --set-val FRAME_WARN 0
-  elif [ "${LTO}" = "thin" ]; then
-    # This is best-effort; some kernels don't support LTO_THIN mode
-    # THINLTO was the old name for LTO_THIN, and it was 'default y'
-    ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
-      -e LTO_CLANG \
-      -d LTO_NONE \
-      -e LTO_CLANG_THIN \
-      -d LTO_CLANG_FULL \
-      -e THINLTO
-  elif [ "${LTO}" = "full" ]; then
-    # THINLTO was the old name for LTO_THIN, and it was 'default y'
-    ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
-      -e LTO_CLANG \
-      -d LTO_NONE \
-      -d LTO_CLANG_THIN \
-      -e LTO_CLANG_FULL \
-      -d THINLTO
+    set -x
+    if [ "${LTO}" = "none" ]; then
+      ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
+        -d LTO_CLANG \
+        -e LTO_NONE \
+        -d LTO_CLANG_THIN \
+        -d LTO_CLANG_FULL \
+        -d THINLTO \
+        --set-val FRAME_WARN 0
+    elif [ "${LTO}" = "thin" ]; then
+      # This is best-effort; some kernels don't support LTO_THIN mode
+      # THINLTO was the old name for LTO_THIN, and it was 'default y'
+      ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
+        -e LTO_CLANG \
+        -d LTO_NONE \
+        -e LTO_CLANG_THIN \
+        -d LTO_CLANG_FULL \
+        -e THINLTO
+    elif [ "${LTO}" = "full" ]; then
+      # THINLTO was the old name for LTO_THIN, and it was 'default y'
+      ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
+        -e LTO_CLANG \
+        -d LTO_NONE \
+        -d LTO_CLANG_THIN \
+        -e LTO_CLANG_FULL \
+        -d THINLTO
+    fi
+    (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" olddefconfig)
+    set +x
+  elif [ -n "${LTO}" ]; then
+    echo "LTO= must be one of 'none', 'thin' or 'full'."
+    exit 1
   fi
-  (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" olddefconfig)
-  set +x
-elif [ -n "${LTO}" ]; then
-  echo "LTO= must be one of 'none', 'thin' or 'full'."
-  exit 1
 fi
 
 if [ -n "${TAGS_CONFIG}" ]; then
