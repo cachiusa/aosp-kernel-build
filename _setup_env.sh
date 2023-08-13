@@ -237,7 +237,7 @@ else
     if [ "${AS}" = "llvm-as" ]; then
       echo "warn: AS=llvm-as is not recommended, changing to clang"
       tool_args+=("AS=clang")
-      else
+    else
       tool_args+=("AS=${AS}")
     fi
   fi

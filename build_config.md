@@ -180,6 +180,9 @@ Location (relative to the repo root directory) of an optional file containing a 
 Location (relative to the repo root directory) of a text file containing the properties to be used for creation of a vendor_dlkm image (filesystem, partition size, etc).  
 If this is not set (and VENDOR_DLKM_MODULES_LIST is), a default set of properties will be used which assumes an ext4 filesystem and a dynamic partition.
 
+### CLANG_TRIPLE
+### NDK_TRIPLE
+
 ## GKI-related options
 ### ABI_DEFINITION
 Location of the abi definition file relative to <REPO_ROOT>/KERNEL_DIR
@@ -360,3 +363,13 @@ FILES="${FILES} rk3399-rock-pi-4b.dtb"
 ```  
 where the dts file path is
 common-modules/virtual-device/rk3399-rock-pi-4b.dts
+
+# List of prebuilt directories shell variables to incorporate into PATH
+LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN
+LINUX_GCC_CROSS_COMPILE_ARM32_PREBUILTS_BIN
+LINUX_GCC_CROSS_COMPILE_COMPAT_PREBUILTS_BIN
+CLANG_PREBUILT_BIN
+LZ4_PREBUILTS_BIN
+DTC_PREBUILTS_BIN
+LIBUFDT_PREBUILTS_BIN
+BUILDTOOLS_PREBUILT_BIN
