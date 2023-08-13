@@ -42,6 +42,7 @@ List of files (relative to [OUT_DIR](#out_dir)) copied to [DIST_DIR](#dist_dir) 
 - If set to "none", force any kernel with LTO_CLANG support to be built without any LTO (upstream default), which results in no optimizations and also disables LTO-dependent features like CFI. This mode is not recommended because CFI will not be able to catch bugs if it is disabled.
 
 ## Advanced options
+<details>
 
 ### BUILD_CONFIG
 Build config file to initialize the build environment from.  
@@ -182,8 +183,11 @@ If this is not set (and VENDOR_DLKM_MODULES_LIST is), a default set of propertie
 
 ### CLANG_TRIPLE
 ### NDK_TRIPLE
+</details>
 
 ## GKI-related options
+<details>
+
 ### ABI_DEFINITION
 Location of the abi definition file relative to <REPO_ROOT>/KERNEL_DIR
 If defined (usually in build.config), also copy that abi definition to
@@ -248,7 +252,6 @@ This should not be set in the upstream GKI build.config.
 If set to "1", build a gki_certification_tools.tar.gz, which contains the utilities used to certify GKI boot-*.img files.
 
 ### BUILD_GKI_ARTIFACTS 
-
 - if defined when `$ARCH` is arm64, build a boot-img.tar.gz archive that contains several GKI `boot-*.img` files with different kernel compression format.  
 Each boot image contains a boot header v4 as per the format defined by https://source.android.com/devices/bootloader/boot-image-header, followed by a kernel (no ramdisk).  
 The kernel binaries are from `${DIST_DIR}`, e.g., Image, Image.gz, Image.lz4, etc.  
@@ -271,8 +274,10 @@ This is required only when ${DIST_DIR}/Image.gz is present.
 This is required only when ${DIST_DIR}/Image.lz4 is present.  
 - **BUILD_GKI_BOOT_IMG_<COMPRESSION>_SIZE**=`<The size of the boot-${compression}.img to build>`  
 This is required only when `${DIST_DIR}/Image.${compression}` is present.
+</details>
 
 ## Post-build operations
+<details>
 
 ### BUILD_BOOT_IMG
 If defined, build a boot.img binary that can be flashed into the 'boot' partition of an Android device.  
@@ -363,13 +368,14 @@ FILES="${FILES} rk3399-rock-pi-4b.dtb"
 ```  
 where the dts file path is
 common-modules/virtual-device/rk3399-rock-pi-4b.dts
+</details>
 
 # List of prebuilt directories shell variables to incorporate into PATH
-LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN
-LINUX_GCC_CROSS_COMPILE_ARM32_PREBUILTS_BIN
-LINUX_GCC_CROSS_COMPILE_COMPAT_PREBUILTS_BIN
-CLANG_PREBUILT_BIN
-LZ4_PREBUILTS_BIN
-DTC_PREBUILTS_BIN
-LIBUFDT_PREBUILTS_BIN
-BUILDTOOLS_PREBUILT_BIN
+LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN  
+LINUX_GCC_CROSS_COMPILE_ARM32_PREBUILTS_BIN  
+LINUX_GCC_CROSS_COMPILE_COMPAT_PREBUILTS_BIN  
+CLANG_PREBUILT_BIN  
+LZ4_PREBUILTS_BIN  
+DTC_PREBUILTS_BIN  
+LIBUFDT_PREBUILTS_BIN  
+BUILDTOOLS_PREBUILT_BIN  
