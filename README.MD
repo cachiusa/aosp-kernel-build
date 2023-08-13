@@ -19,14 +19,15 @@ or:
 Examples:  
     To define custom out and dist directories:  
 
-      ```sh
-      OUT_DIR=output DIST_DIR=dist build/build.sh -j24 V=1
-      ```  
+```shellscript
+OUT_DIR=output DIST_DIR=dist build/build.sh -j24 V=1
+```  
+
    To use a custom build config:  
 
-      ```sh
-      BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh -j24 V=1
-      ```
+```shellscript
+BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh -j24 V=1
+```
 
 ## config.sh
 Runs a configuration editor inside kernel/build environment.   
@@ -35,6 +36,6 @@ Usage:
 
 Example:  
 
-    ```sh
-    build/config.sh menuconfig|config|nconfig|... (default to menuconfig)
-    ```
+```shellscript
+build/config.sh menuconfig|config|nconfig|... (default to menuconfig)
+```
