@@ -234,10 +234,12 @@ else
   fi
 
   if [ -n "${AS}" ]; then
-    tool_args+=("AS=${AS}")
-  elif [[ "${AS}" == "llvm-as" ]]
-    echo "warn: AS=llvm-as is not recommended, changing to clang"
-    tool_args+=("AS=clang")
+    if [ "${AS}" = "llvm-as" ]; then
+      echo "warn: AS=llvm-as is not recommended, changing to clang"
+      tool_args+=("AS=clang")
+      else
+      tool_args+=("AS=${AS}")
+    fi
   fi
 fi
 
