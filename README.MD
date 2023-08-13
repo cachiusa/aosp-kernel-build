@@ -18,10 +18,12 @@ or:
 
 Examples:  
     To define custom out and dist directories:  
+
       ```sh
       OUT_DIR=output DIST_DIR=dist build/build.sh -j24 V=1
       ```  
    To use a custom build config:  
+
       ```sh
       BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh -j24 V=1
       ```
@@ -32,6 +34,7 @@ Usage:
     `build/config.sh <config editor> <make options>*`
 
 Example:  
+
     ```sh
     build/config.sh menuconfig|config|nconfig|... (default to menuconfig)
     ```
