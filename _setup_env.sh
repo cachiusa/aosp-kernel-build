@@ -23,6 +23,16 @@
 # TODO: Use a $(gettop) style method.
 export ROOT_DIR=$(readlink -f $PWD)
 
+case "${LOG}" in
+  "") ;;
+  "1")  echo "Saving log to ${ROOT_DIR}/build.log"
+        exec &> >(tee build.log)
+        echo " $(date)" ;;
+  *)  echo "Saving log to ${ROOT_DIR}/${LOG}"
+      exec &> >(tee ${LOG})
+      echo " $(date)"
+esac
+
 export BUILD_CONFIG=${BUILD_CONFIG:-build.config}
 
 # Helper function to let build.config files add command to PRE_DEFCONFIG_CMDS, EXTRA_CMDS, etc.
