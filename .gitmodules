@@ -1,0 +1,3 @@
+[submodule "aosp-buildtools"]
+	path = aosp-buildtools
+	url = https://github.com/cachiusa/aosp-buildtools
