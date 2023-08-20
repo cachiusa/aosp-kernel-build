@@ -1025,3 +1025,16 @@ function check_defconfig() {
     fi
     return ${RES}
 }
+
+function rmf() { 
+  # Read a variable named $1 in Makefile
+  echo $(grep -m 1 "$1" "${KERNEL_DIR}/Makefile" | sed 's/.*= *//' | tr -d ' ')
+}
+
+# Prints the final kernel version string
+function kernelrelease() {
+  REALROOTDIR=$(realpath ${ROOT_DIR})
+  VER=$(rmf VERSION).$(rmf PATCHLEVEL).$(rmf SUBLEVEL)
+  cd ${OUT_DIR}
+  echo "$VER$($REALROOTDIR/${KERNEL_DIR}/scripts/setlocalversion $REALROOTDIR/${KERNEL_DIR} ${BRANCH} ${KMI_GENERATION})"
+}

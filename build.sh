@@ -749,8 +749,7 @@ fi
 
 echo "========================================================"
 echo " Building kernel"
-echo " - Kernel version:"
-echo "      $(cd ${OUT_DIR} && make -s O=${OUT_DIR} kernelrelease 2> /dev/null)"
+echo "        $(kernelrelease)"
 echo
 set -x
 (cd ${OUT_DIR} && make O=${OUT_DIR} ${TOOL_ARGS} "${MAKE_ARGS[@]}" ${MAKE_GOALS})
