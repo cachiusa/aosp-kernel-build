@@ -54,13 +54,27 @@ if [ -z "${KERNEL_DIR}" ]; then
     # for the case that KERNEL_DIR is specified in the BUILD_CONFIG file,
     # or via the config files sourced, the value of KERNEL_DIR
     # set here would be overwritten, and the specified value would be used.
-    build_config_path=$(readlink -f ${ROOT_DIR}/${BUILD_CONFIG})
-    real_root_dir=${build_config_path%%${BUILD_CONFIG}}
+    #build_config_path=$(readlink -f ${ROOT_DIR}/${BUILD_CONFIG})
+    #real_root_dir=${build_config_path%%${BUILD_CONFIG}}
+    build_config_path=$(realpath ${ROOT_DIR}/${BUILD_CONFIG})
     build_config_dir=$(dirname ${build_config_path})
     build_config_dir=${build_config_dir##${ROOT_DIR}/}
-    build_config_dir=${build_config_dir##${real_root_dir}}
+    #build_config_dir=${build_config_dir##${real_root_dir}}
     KERNEL_DIR="${build_config_dir}"
+    echo " Set default KERNEL_DIR: ${KERNEL_DIR}"
+    if [ ${KERNEL_DIR} = ${ROOT_DIR} ]; then
+      KERNEL_DIR=.
+    fi
+else 
+    echo " User environment KERNEL_DIR: ${KERNEL_DIR}"
 fi
+echo " The final value for KERNEL_DIR: ${KERNEL_DIR}"
+
+echo "========================================================"
+echo " Build config: ${ROOT_DIR}/${BUILD_CONFIG}"
+echo
+cat ${ROOT_DIR}/${BUILD_CONFIG}
+
 
 set -a
 . ${ROOT_DIR}/${BUILD_CONFIG}
@@ -68,6 +82,24 @@ for fragment in ${BUILD_CONFIG_FRAGMENTS}; do
   . ${ROOT_DIR}/${fragment}
 done
 set +a
+
+# Get a list of build configs sourced by this file"
+FRGMNTS=""
+FRGMNTS+="$(grep -E '^\.\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
+#FRGMNTS+="$(grep -E '^source\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
+if [ ! -z "$FRGMNTS" ]; then
+  FRGMNTS=${FRGMNTS//. /}
+  for frag in ${FRGMNTS[@]}; do
+    if [[ $frag = *'${ROOT_DIR}'* ]]; then
+      frag=$(echo $frag | sed 's|${ROOT_DIR}/||g')
+    fi
+    frag=$(eval echo $frag)
+    echo "========================================================"
+    echo " Sparse build config: $frag"
+    echo
+    cat $frag
+  done
+fi
 
 # For incremental kernel development, it is beneficial to trade certain
 # optimizations for faster builds.
@@ -190,6 +222,13 @@ for prebuilt_bin in "${prebuilts_paths[@]}"; do
     fi
 done
 export PATH
+echo "========================================================"
+echo "PATH="
+IFS=':' read -ra echopaths <<< "$PATH"
+for lst in "${echopaths[@]}"; do
+    echo "  $lst"
+done
+
 
 unset LD_LIBRARY_PATH
 unset PYTHONPATH
@@ -246,7 +285,7 @@ else
   if [ -n "${AS}" ]; then
     if [ "${AS}" = "llvm-as" ]; then
       echo "warn: AS=llvm-as is not recommended, changing to clang"
-      tool_args+=("AS=clang")
+      tool_args+=("LLVM_IAS=1")
     else
       tool_args+=("AS=${AS}")
     fi
