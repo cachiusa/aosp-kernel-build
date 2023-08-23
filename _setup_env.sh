@@ -166,9 +166,12 @@ for prebuilt_bin in "${prebuilts_paths[@]}"; do
 done
 export PATH
 
-echo
-echo "PATH=${PATH}"
-echo
+echo "========================================================"
+echo " PATH="
+IFS=':' read -ra echopaths <<< "$PATH"
+for lst in "${echopaths[@]}"; do
+    echo "     $lst"
+done
 
 unset PYTHONPATH
 unset PYTHONHOME
