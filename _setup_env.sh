@@ -90,9 +90,9 @@ FRGMNTS+="$(grep -E '^\.\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
 if [ ! -z "$FRGMNTS" ]; then
   FRGMNTS=${FRGMNTS//. /}
   for frag in ${FRGMNTS[@]}; do
-    if [[ $frag = *'${ROOT_DIR}'* ]]; then
-      frag=$(echo $frag | sed 's|${ROOT_DIR}/||g')
-    fi
+    #if [[ $frag = *'${ROOT_DIR}'* ]]; then
+    #  frag=$(echo $frag | sed 's|${ROOT_DIR}/||g')
+    #fi
     frag=$(eval echo $frag)
     echo "========================================================"
     echo " Sparse build config: $frag"
