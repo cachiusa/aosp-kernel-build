@@ -84,9 +84,10 @@ done
 set +a
 
 # Get a list of build configs sourced by this file"
+set +e
 FRGMNTS=""
-FRGMNTS+="$(grep -E '^\.\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
-#FRGMNTS+="$(grep -E '^source\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
+FRGMNTS="$(grep -E '^\.\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
+FRGMNTS+="$(grep -E '^source\ ' ${ROOT_DIR}/${BUILD_CONFIG})"
 if [ ! -z "$FRGMNTS" ]; then
   FRGMNTS=${FRGMNTS//. /}
   for frag in ${FRGMNTS[@]}; do
@@ -100,6 +101,7 @@ if [ ! -z "$FRGMNTS" ]; then
     cat $frag
   done
 fi
+set -e
 
 # For incremental kernel development, it is beneficial to trade certain
 # optimizations for faster builds.
