@@ -245,7 +245,31 @@ tool_args=()
 # specifying CC=clang LD=ld.lld NM=llvm-nm OBJCOPY=llvm-objcopy <etc>, for
 # newer kernel versions.
 if [[ -n "${LLVM}" ]]; then
+  case ${LLVM} in
+    -*) LLVM_SUFFIX=${LLVM} ;;
+    */) LLVM_PREFIX=${LLVM}
+  esac
   tool_args+=("LLVM=1")
+  # Make $(LLVM) more flexible. Set a version suffix by leaving a dash
+  # at beginning or set path to toolchain by leaving trailing slash.
+  if [[ -n ${LLVM_SUFFIX} || -n ${LLVM_PREFIX} ]]; then
+    set -a
+    HOSTCC="${LLVM_PREFIX}clang${LLVM_SUFFIX}"
+    HOSTCXX="${LLVM_PREFIX}clang++${LLVM_SUFFIX}"
+    HOSTLD="${LLVM_PREFIX}ld.lld${LLVM_SUFFIX}"
+    HOSTAR="${LLVM_PREFIX}llvm-ar${LLVM_SUFFIX}"
+    CC="${LLVM_PREFIX}clang${LLVM_SUFFIX}"
+    LD="${LLVM_PREFIX}ld.lld${LLVM_SUFFIX}"
+    AR="${LLVM_PREFIX}llvm-ar${LLVM_SUFFIX}"
+    NM="${LLVM_PREFIX}llvm-nm${LLVM_SUFFIX}"
+    OBJCOPY="${LLVM_PREFIX}llvm-objcopy${LLVM_SUFFIX}"
+    OBJDUMP="${LLVM_PREFIX}llvm-objdump${LLVM_SUFFIX}"
+    OBJSIZE="${LLVM_PREFIX}llvm-size${LLVM_SUFFIX}"
+    READELF="${LLVM_PREFIX}llvm-readelf${LLVM_SUFFIX}"
+    STRIP="${LLVM_PREFIX}llvm-strip${LLVM_SUFFIX}"
+    set +a
+  fi
+
   # Reset a bunch of variables that the kernel's top level Makefile does, just
   # in case someone tries to use these binaries in this script such as in
   # initramfs generation below.
