@@ -269,7 +269,9 @@ if [[ -n "${LLVM}" ]]; then
     STRIP="${LLVM_PREFIX}llvm-strip${LLVM_SUFFIX}"
     set +a
   fi
-
+  if [ -n ${CCACHE} ]; then
+    export CC="${CCACHE} ${CC:-clang}"
+  fi
   # Reset a bunch of variables that the kernel's top level Makefile does, just
   # in case someone tries to use these binaries in this script such as in
   # initramfs generation below.
@@ -290,7 +292,11 @@ else
   fi
 
   if [ -n "${CC}" ]; then
-    tool_args+=("CC=${CC}")
+    if [ -n "${CCACHE}" ]; then
+      tool_args+=("CC=${CCACHE} ${CC}")
+    else
+      tool_args+=("CC=${CC}")
+    fi
     if [ -z "${HOSTCC}" ]; then
       tool_args+=("HOSTCC=${CC}")
     fi
