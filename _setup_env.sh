@@ -253,12 +253,11 @@ if [[ -n "${LLVM}" ]]; then
   # Make $(LLVM) more flexible. Set a version suffix by leaving a dash
   # at beginning or set path to toolchain by leaving trailing slash.
   if [[ -n ${LLVM_SUFFIX} || -n ${LLVM_PREFIX} ]]; then
-    set -a
+    tool_args+="
     HOSTCC="${LLVM_PREFIX}clang${LLVM_SUFFIX}"
     HOSTCXX="${LLVM_PREFIX}clang++${LLVM_SUFFIX}"
     HOSTLD="${LLVM_PREFIX}ld.lld${LLVM_SUFFIX}"
     HOSTAR="${LLVM_PREFIX}llvm-ar${LLVM_SUFFIX}"
-    CC="${LLVM_PREFIX}clang${LLVM_SUFFIX}"
     LD="${LLVM_PREFIX}ld.lld${LLVM_SUFFIX}"
     AR="${LLVM_PREFIX}llvm-ar${LLVM_SUFFIX}"
     NM="${LLVM_PREFIX}llvm-nm${LLVM_SUFFIX}"
@@ -267,17 +266,15 @@ if [[ -n "${LLVM}" ]]; then
     OBJSIZE="${LLVM_PREFIX}llvm-size${LLVM_SUFFIX}"
     READELF="${LLVM_PREFIX}llvm-readelf${LLVM_SUFFIX}"
     STRIP="${LLVM_PREFIX}llvm-strip${LLVM_SUFFIX}"
-    set +a
-  fi
-  if [ -n ${CCACHE} ]; then
-    export CC="${CCACHE} ${CC:-clang}"
+    "
+    export CC="${LLVM_PREFIX}clang${LLVM_SUFFIX}"
   fi
   # Reset a bunch of variables that the kernel's top level Makefile does, just
   # in case someone tries to use these binaries in this script such as in
   # initramfs generation below.
   HOSTCC=clang
   HOSTCXX=clang++
-  CC=clang
+  #CC=clang
   LD=ld.lld
   AR=llvm-ar
   NM=llvm-nm
@@ -292,11 +289,7 @@ else
   fi
 
   if [ -n "${CC}" ]; then
-    if [ -n "${CCACHE}" ]; then
-      tool_args+=("CC=${CCACHE} ${CC}")
-    else
-      tool_args+=("CC=${CC}")
-    fi
+    CC=${CC}
     if [ -z "${HOSTCC}" ]; then
       tool_args+=("HOSTCC=${CC}")
     fi
@@ -336,6 +329,19 @@ fi
 
 if [ -n "${DTC}" ]; then
   tool_args+=("DTC=${DTC}")
+fi
+
+if [[ -n ${CCACHE} ]]; then
+  if [[ -n ${LLVM} ]]; then
+    tool_args+="CC=${CCACHE} ${CC:-clang}"
+  elif [[ -n ${CC} ]]; then
+    tool_args+="CC=${CCACHE} ${CC}"
+  else
+    echo "ERROR: CCACHE requires CC to be set"
+    exit 1
+  fi
+elif [[ -n ${CC} ]]; then
+  tool_args+=("CC=${CC}")
 fi
 
 export TOOL_ARGS="${tool_args[@]}"
