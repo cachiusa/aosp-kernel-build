@@ -11,9 +11,8 @@ jobs:
             - name: Checkout local
               uses: actions/checkout@v3
               with:
-                ref: main
+                ref: master
                 fetch-depth: 0
-            - name: Pull
+            - name: Run updater
               run: |
-                git pull https://android.googlesource.com/kernel/build main --ff-only --no-tags
-                git push
+                ./repoupdate.sh
