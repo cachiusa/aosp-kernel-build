@@ -34,7 +34,7 @@ case "${LOG}" in
 esac
 
 if [[ -z ${BUILD_CONFIG} ]]; then
-  echo "BUILD_CONFIG is not set. Attempting to find..."
+  echo "BUILD_CONFIG is not set. Trying to find..."
   . $(dirname $0)/whereis-config.sh
 else
   export BUILD_CONFIG=${BUILD_CONFIG:-build.config}
