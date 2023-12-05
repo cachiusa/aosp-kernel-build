@@ -742,3 +742,14 @@ function kernelrelease() {
   cd ${OUT_DIR}
   echo "$VER$($REALROOTDIR/${KERNEL_DIR}/scripts/setlocalversion $REALROOTDIR/${KERNEL_DIR} ${BRANCH} ${KMI_GENERATION})"
 }
+
+# Run the command with set -x
+function vexec() {
+  set -x
+  eval "$@"
+  set +x
+}
+
+function interactive_console() {
+  [[ $- == *i* ]]
+}
