@@ -61,7 +61,13 @@ else
   export BUILD_CONFIG="${selected_opt}"
   if yn "Create symlink 'build.config' in current directory for subsequent builds?"; then
     echo "Done."
-    [[ -e build_utils.sh ]] && ln -sf ${selected_opt} ../build.config || ln -sf ${selected_opt} ./build.config
+    if [[ -e build_utils.sh ]]; then
+      cd ..
+      ln -sf $(echo ${selected_opt} | sed 's/^\.\.\///g') build.config
+      cd $(dirname $0)
+    else
+      ln -sf ${selected_opt} ./build.config
+    fi
   fi
   echo
 fi
