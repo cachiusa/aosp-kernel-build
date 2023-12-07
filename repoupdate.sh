@@ -13,11 +13,13 @@ fi
 echo
 
 echo "- Fetching"
-git remote add upstream $remote -f --tags | grep -v "new branch"
+git remote add upstream $remote
+git fetch upstream --tags --quiet
 echo
 for branch in $target; do
   echo "- Updating $branch"
   git -c advice.detachedHead=false checkout -f upstream/$branch
+  echo
   git push origin HEAD:$branch
   echo
 done
