@@ -5,6 +5,10 @@ on:
     workflow_dispatch:
     push:
       branches: master
+      paths:
+        - 'trackedbranch'
+        - '.github/workflows/main.yml'
+        - 'repoupdate.sh'
 jobs:
     fetch:
         name: Fetch upstream
