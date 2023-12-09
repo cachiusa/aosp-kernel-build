@@ -32,7 +32,12 @@ case "${LOG}" in
       echo " $(date)"
 esac
 
-export BUILD_CONFIG=${BUILD_CONFIG:-build.config}
+if [[ -z ${BUILD_CONFIG} ]]; then
+  echo "BUILD_CONFIG is not set. Trying to find..."
+  . $(dirname $(readlink -f $0))/whereis-config.sh
+else
+  export BUILD_CONFIG=${BUILD_CONFIG:-build.config}
+fi
 
 # Helper function to let build.config files add command to PRE_DEFCONFIG_CMDS, EXTRA_CMDS, etc.
 # Usage: append_cmd PRE_DEFCONFIG_CMDS 'the_cmd'
