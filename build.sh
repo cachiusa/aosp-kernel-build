@@ -917,6 +917,8 @@ done
 if [ -z "${SKIP_CP_KERNEL_HDR}" ]; then
   echo "========================================================"
   echo " Installing UAPI kernel headers:"
+
+  if which rsync ; then 
   mkdir -p "${KERNEL_UAPI_HEADERS_DIR}/usr"
   make -C ${OUT_DIR} O=${OUT_DIR} ${TOOL_ARGS}                                \
           INSTALL_HDR_PATH="${KERNEL_UAPI_HEADERS_DIR}/usr" "${MAKE_ARGS[@]}" \
@@ -927,6 +929,9 @@ if [ -z "${SKIP_CP_KERNEL_HDR}" ]; then
   KERNEL_UAPI_HEADERS_TAR=${DIST_DIR}/kernel-uapi-headers.tar.gz
   echo " Copying kernel UAPI headers to ${KERNEL_UAPI_HEADERS_TAR}"
   tar -czf ${KERNEL_UAPI_HEADERS_TAR} --directory=${KERNEL_UAPI_HEADERS_DIR} usr/
+  else
+    echo "rsync: not found, skipping"
+  fi
 fi
 
 if [ -z "${SKIP_CP_KERNEL_HDR}" ] ; then
