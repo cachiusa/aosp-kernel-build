@@ -179,7 +179,7 @@ echo "========================================================"
 echo " Setting up for build"
 if [ "${SKIP_MRPROPER}" != "1" ] ; then
   set -x
-  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" mrproper)
+  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" mrproper)
   set +x
 fi
 
@@ -193,7 +193,7 @@ fi
 
 if [ "${SKIP_DEFCONFIG}" != "1" ] ; then
   set -x
-  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" ${DEFCONFIG})
+  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" ${DEFCONFIG})
   set +x
 
   if [ -n "${POST_DEFCONFIG_CMDS}" ]; then
@@ -237,7 +237,7 @@ if [[ ! "${CC}" = *"gcc"* ]]; then
         -e LTO_CLANG_FULL \
         -d THINLTO
     fi
-    (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${MAKE_ARGS[@]}" olddefconfig)
+    (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" olddefconfig)
     set +x
   elif [ -n "${LTO}" ]; then
     echo "LTO= must be one of 'none', 'thin' or 'full'."
@@ -335,7 +335,7 @@ echo " - Kernel version:"
 echo "      $(kernelrelease)"
 echo
 set -x
-(cd ${OUT_DIR} && make O=${OUT_DIR} ${TOOL_ARGS} "${MAKE_ARGS[@]}" ${MAKE_GOALS})
+(cd ${OUT_DIR} && make O=${OUT_DIR} ${TOOL_ARGS} "${cc}" "${MAKE_ARGS[@]}" ${MAKE_GOALS})
 set +x
 
 if [ -n "${POST_KERNEL_BUILD_CMDS}" ]; then
