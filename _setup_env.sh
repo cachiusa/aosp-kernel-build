@@ -338,9 +338,9 @@ fi
 
 if [[ -n ${CCACHE} ]]; then
   if [[ -n ${LLVM} ]]; then
-    tool_args+="CC=${CCACHE} ${CC:-clang}"
+    cc+="CC=${CCACHE} ${CC:-clang}"
   elif [[ -n ${CC} ]]; then
-    tool_args+="CC=${CCACHE} ${CC}"
+    cc+="CC=${CCACHE} ${CC}"
   else
     echo "ERROR: CCACHE requires CC to be set"
     exit 1
