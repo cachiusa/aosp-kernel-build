@@ -179,7 +179,7 @@ echo "========================================================"
 echo " Setting up for build"
 if [ "${SKIP_MRPROPER}" != "1" ] ; then
   set -x
-  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" mrproper)
+  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc[@]}" "${MAKE_ARGS[@]}" mrproper)
   set +x
 fi
 
@@ -193,7 +193,7 @@ fi
 
 if [ "${SKIP_DEFCONFIG}" != "1" ] ; then
   set -x
-  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" ${DEFCONFIG})
+  (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc[@]}" "${MAKE_ARGS[@]}" ${DEFCONFIG})
   set +x
 
   if [ -n "${POST_DEFCONFIG_CMDS}" ]; then
@@ -237,7 +237,7 @@ if [[ ! "${CC}" = *"gcc"* ]]; then
         -e LTO_CLANG_FULL \
         -d THINLTO
     fi
-    (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc}" "${MAKE_ARGS[@]}" olddefconfig)
+    (cd ${OUT_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} "${cc[@]}" "${MAKE_ARGS[@]}" olddefconfig)
     set +x
   elif [ -n "${LTO}" ]; then
     echo "LTO= must be one of 'none', 'thin' or 'full'."
@@ -307,7 +307,7 @@ if [ -n "${KMI_SYMBOL_LIST}" ]; then
               -d UNUSED_SYMBOLS -e TRIM_UNUSED_KSYMS \
               --set-str UNUSED_KSYMS_WHITELIST ${OUT_DIR}/abi_symbollist.raw
       (cd ${OUT_DIR} && \
-              make O=${OUT_DIR} ${TOOL_ARGS} "${MAKE_ARGS[@]}" olddefconfig)
+              make O=${OUT_DIR} ${TOOL_ARGS} "${cc[@]}" "${MAKE_ARGS[@]}" olddefconfig)
       # Make sure the config is applied
       grep CONFIG_UNUSED_KSYMS_WHITELIST ${OUT_DIR}/.config > /dev/null || {
         echo "ERROR: Failed to apply TRIM_NONLISTED_KMI kernel configuration" >&2
@@ -335,7 +335,7 @@ echo " - Kernel version:"
 echo "      $(kernelrelease)"
 echo
 set -x
-(cd ${OUT_DIR} && make O=${OUT_DIR} ${TOOL_ARGS} "${cc}" "${MAKE_ARGS[@]}" ${MAKE_GOALS})
+(cd ${OUT_DIR} && make O=${OUT_DIR} ${TOOL_ARGS} "${cc[@]}" "${MAKE_ARGS[@]}" ${MAKE_GOALS})
 set +x
 
 if [ -n "${POST_KERNEL_BUILD_CMDS}" ]; then
@@ -381,7 +381,7 @@ if [ "${BUILD_INITRAMFS}" = "1" -o  -n "${IN_KERNEL_MODULES}" ]; then
   echo " Installing kernel modules into staging directory"
 
   (cd ${OUT_DIR} &&                                                           \
-   make O=${OUT_DIR} ${TOOL_ARGS} ${MODULE_STRIP_FLAG}                        \
+   make O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS} ${MODULE_STRIP_FLAG}                        \
         INSTALL_MOD_PATH=${MODULES_STAGING_DIR} "${MAKE_ARGS[@]}" modules_install)
 fi
 
@@ -390,7 +390,7 @@ if [[ -z "${SKIP_EXT_MODULES}" ]] && [[ -n "${EXT_MODULES_MAKEFILE}" ]]; then
   echo " Building and installing external modules using ${EXT_MODULES_MAKEFILE}"
 
   make -f "${EXT_MODULES_MAKEFILE}" KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR} \
-          O=${OUT_DIR} ${TOOL_ARGS} ${MODULE_STRIP_FLAG}                 \
+          O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS} ${MODULE_STRIP_FLAG}                 \
           INSTALL_HDR_PATH="${KERNEL_UAPI_HEADERS_DIR}/usr"              \
           INSTALL_MOD_PATH=${MODULES_STAGING_DIR} "${MAKE_ARGS[@]}"
 fi
@@ -412,7 +412,7 @@ if [[ -z "${SKIP_EXT_MODULES}" ]] && [[ -n "${EXT_MODULES}" ]]; then
     mkdir -p ${OUT_DIR}/${EXT_MOD_REL}
     set -x
     make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR}  \
-                       O=${OUT_DIR} ${TOOL_ARGS} "${MAKE_ARGS[@]}"
+                       O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS} "${MAKE_ARGS[@]}"
     make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR}  \
                        O=${OUT_DIR} ${TOOL_ARGS} ${MODULE_STRIP_FLAG}         \
                        INSTALL_MOD_PATH=${MODULES_STAGING_DIR}                \
@@ -502,7 +502,7 @@ if [ -z "${SKIP_CP_KERNEL_HDR}" ]; then
   echo " Installing UAPI kernel headers:"
   if which rsync ; then 
     mkdir -p "${KERNEL_UAPI_HEADERS_DIR}/usr"
-    make -C ${OUT_DIR} O=${OUT_DIR} ${TOOL_ARGS}                                \
+    make -C ${OUT_DIR} O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS}                                \
             INSTALL_HDR_PATH="${KERNEL_UAPI_HEADERS_DIR}/usr" "${MAKE_ARGS[@]}" \
             headers_install
     # The kernel makefiles create files named ..install.cmd and .install which
