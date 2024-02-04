@@ -312,7 +312,7 @@ function build_vendor_dlkm() {
 
 function check_mkbootimg_path() {
   if [ -z "${MKBOOTIMG_PATH}" ]; then
-    MKBOOTIMG_PATH="tools/mkbootimg/mkbootimg.py"
+    MKBOOTIMG_PATH="mkbootimg"
   fi
   if [ ! -f "${MKBOOTIMG_PATH}" ]; then
     echo "mkbootimg.py script not found. MKBOOTIMG_PATH = ${MKBOOTIMG_PATH}"
