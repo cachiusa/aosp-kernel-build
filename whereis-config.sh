@@ -27,8 +27,11 @@ choose() {
       selected_opt="${array[$(($selected_index-1))]}"
       echo "Selecting ${selected_opt}"
       break
+    elif [[ -z "$selected_index" ]]; then
+      exit
     else
-      echo "Invalid selection."
+      echo "Invalid selection"
+      echo "hint: Leave blank to cancel"
       echo
       fi
   done   
@@ -47,11 +50,26 @@ yn() {
     done
 }
 
-
+declare -A seen_files  # Associative array to store seen files
+add_unique_files() {
+    local files=("$@")
+    for file in "${files[@]}"; do
+        # Resolve the full path using realpath
+        full_path=$(realpath "$file")
+        # Get the relative path to the current directory
+        relative_path=$(realpath --relative-to=. "$file")
+        # Check if the file has not been seen before
+        if [[ ! -n "${seen_files[$full_path]}" ]]; then
+            found+=("$relative_path")  # Add to the 'found' array using relative path
+            seen_files["$full_path"]=1  # Mark as seen
+        fi
+    done
+}
 parent_dir_files=($(find .. -mindepth 1 -maxdepth 2 -name "build.config*" -type f))
-found+=("${parent_dir_files[@]}")
+add_unique_files "${parent_dir_files[@]}"
+
 all_folders_files=($(find . -maxdepth 2 -name "build.config*" -type f))
-found+=("${all_folders_files[@]}")
+add_unique_files "${all_folders_files[@]}"
 
 if [[ -e ./build.config ]]; then
   echo "Found saved build.config in working directory"
