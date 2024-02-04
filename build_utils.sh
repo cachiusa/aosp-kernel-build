@@ -589,7 +589,7 @@ EOF
 
 function check_mkbootimg_path() {
   if [ -z "${MKBOOTIMG_PATH}" ]; then
-    MKBOOTIMG_PATH="tools/mkbootimg/mkbootimg.py"
+    MKBOOTIMG_PATH="mkbootimg"
   fi
   if [ ! -f "${MKBOOTIMG_PATH}" ]; then
     echo "ERROR: mkbootimg.py script not found. MKBOOTIMG_PATH = ${MKBOOTIMG_PATH}" >&2
