@@ -1,3 +1,0 @@
-[submodule "aosp-buildtools"]
-	path = aosp-buildtools
-	url = https://gitlab.com/dogthepro/aosp-buildtools
