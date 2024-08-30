@@ -438,6 +438,7 @@ if [ "${BUILD_GKI_CERTIFICATION_TOOLS}" = "1"  ]; then
     -C ${GKI_CERTIFICATION_TOOLS_ROOT} ${GKI_CERTIFICATION_FILES}
 fi
 
+if [ -n "${GENERATE_TEST_MAPPINGS}" ]; then 
 echo "========================================================"
 echo " Generating test_mappings.zip"
 TEST_MAPPING_FILES=${OUT_DIR}/test_mapping_files.txt
@@ -447,6 +448,7 @@ find ${ROOT_DIR} -name TEST_MAPPING \
   -not -path "${ROOT_DIR}/out*" \
   > ${TEST_MAPPING_FILES}
 soong_zip -o ${DIST_DIR}/test_mappings.zip -C ${ROOT_DIR} -l ${TEST_MAPPING_FILES}
+fi
 
 if [ -n "${EXTRA_CMDS}" ]; then
   echo "========================================================"

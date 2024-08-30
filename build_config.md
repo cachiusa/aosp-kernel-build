@@ -363,3 +363,6 @@ FILES="${FILES} rk3399-rock-pi-4b.dtb"
 ```  
 where the dts file path is
 common-modules/virtual-device/rk3399-rock-pi-4b.dts
+
+### GENERATE_TEST_MAPPINGS
+If defined, generate `test_mappings.zip` file in [DIST_DIR](#dist_dir)
