@@ -97,8 +97,11 @@ export UNSTRIPPED_MODULES_ARCHIVE=unstripped_modules.tar.gz
 export MODULES_ARCHIVE=modules.tar.gz
 
 echo "========================================================"
-echo "= build config: ${ROOT_DIR}/${BUILD_CONFIG}"
+echo -e "=== Build config: ${ROOT_DIR}/${BUILD_CONFIG}\n"
+echo
 cat ${ROOT_DIR}/${BUILD_CONFIG}
+echo -e "\n=== end: ${ROOT_DIR}/${BUILD_CONFIG}"
+echo "========================================================"
 
 export TZ=UTC
 export LC_ALL=C
@@ -170,8 +173,9 @@ echo "========================================================"
 echo " PATH="
 IFS=':' read -ra echopaths <<< "$PATH"
 for lst in "${echopaths[@]}"; do
-    echo "     $lst"
+    echo "      $lst"
 done
+echo
 
 unset PYTHONPATH
 unset PYTHONHOME
