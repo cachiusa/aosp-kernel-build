@@ -180,6 +180,9 @@ Location (relative to the repo root directory) of an optional file containing a 
 Location (relative to the repo root directory) of a text file containing the properties to be used for creation of a vendor_dlkm image (filesystem, partition size, etc).  
 If this is not set (and VENDOR_DLKM_MODULES_LIST is), a default set of properties will be used which assumes an ext4 filesystem and a dynamic partition.
 
+### USE_ABI_PROP
+If defined, `abi.prop` will be generated in [DIST_DIR](#dist_dir) during build
+
 ## GKI-related options
 ### ABI_DEFINITION
 Location of the abi definition file relative to <REPO_ROOT>/KERNEL_DIR
