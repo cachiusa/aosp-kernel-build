@@ -255,7 +255,12 @@ if [ -n "${TAGS_CONFIG}" ]; then
 fi
 
 # Truncate abi.prop file
-ABI_PROP=${DIST_DIR}/abi.prop
+if [ -n "${USE_ABI_PROP}" ]; then
+  ABI_PROP=${DIST_DIR}/abi.prop
+else
+  ABI_PROP=/dev/null
+fi
+
 : > ${ABI_PROP}
 
 if [ -n "${ABI_DEFINITION}" ]; then
