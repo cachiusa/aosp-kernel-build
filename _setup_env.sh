@@ -79,7 +79,7 @@ echo "========================================================"
 echo " Build config: ${ROOT_DIR}/${BUILD_CONFIG}"
 echo
 cat ${ROOT_DIR}/${BUILD_CONFIG}
-
+echo
 
 set -a
 . ${ROOT_DIR}/${BUILD_CONFIG}
@@ -100,9 +100,9 @@ if [ ! -z "$FRGMNTS" ]; then
     #  frag=$(echo $frag | sed 's|${ROOT_DIR}/||g')
     #fi
     frag=$(eval echo $frag)
+    echo
     echo "========================================================"
     echo " Sparse build config: $frag"
-    echo
     cat $frag
   done
 fi
@@ -233,12 +233,12 @@ for prebuilt_bin in "${prebuilts_paths[@]}"; do
 done
 export PATH
 echo "========================================================"
-echo "PATH="
+echo " PATH="
 IFS=':' read -ra echopaths <<< "$PATH"
 for lst in "${echopaths[@]}"; do
-    echo "  $lst"
+    echo "     $lst"
 done
-
+echo
 
 unset LD_LIBRARY_PATH
 unset PYTHONPATH
