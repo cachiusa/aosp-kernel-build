@@ -365,7 +365,7 @@ if [ "${KMI_SYMBOL_LIST_STRICT_MODE}" = "1" ]; then
   echo " Comparing the KMI and the symbol lists:"
   set -x
 
-  gki_modules_list="${ROOT_DIR}/${KERNEL_DIR}/android/gki_system_dlkm_modules"
+  gki_modules_list="${KERNEL_DIR}/android/gki_system_dlkm_modules"
   KMI_STRICT_MODE_OBJECTS="vmlinux $(sed 's/\.ko$//' ${gki_modules_list} | tr '\n' ' ')" \
     ${ROOT_DIR}/build/abi/compare_to_symbol_list "${OUT_DIR}/Module.symvers"             \
     "${OUT_DIR}/abi_symbollist.raw"
@@ -392,7 +392,7 @@ if [[ -z "${SKIP_EXT_MODULES}" ]] && [[ -n "${EXT_MODULES_MAKEFILE}" ]]; then
   echo "========================================================"
   echo " Building and installing external modules using ${EXT_MODULES_MAKEFILE}"
 
-  make -f "${EXT_MODULES_MAKEFILE}" KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR} \
+  make -f "${EXT_MODULES_MAKEFILE}" KERNEL_SRC=${KERNEL_DIR} \
           O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS} ${MODULE_STRIP_FLAG}                 \
           INSTALL_HDR_PATH="${KERNEL_UAPI_HEADERS_DIR}/usr"              \
           INSTALL_MOD_PATH=${MODULES_STAGING_DIR} "${MAKE_ARGS[@]}"
@@ -414,9 +414,9 @@ if [[ -z "${SKIP_EXT_MODULES}" ]] && [[ -n "${EXT_MODULES}" ]]; then
     # build system behaves horribly wrong.
     mkdir -p ${OUT_DIR}/${EXT_MOD_REL}
     set -x
-    make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR}  \
+    make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${KERNEL_DIR}  \
                        O=${OUT_DIR} "${cc[@]}" ${TOOL_ARGS} "${MAKE_ARGS[@]}"
-    make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${ROOT_DIR}/${KERNEL_DIR}  \
+    make -C ${EXT_MOD} M=${EXT_MOD_REL} KERNEL_SRC=${KERNEL_DIR}  \
                        O=${OUT_DIR} ${TOOL_ARGS} ${MODULE_STRIP_FLAG}         \
                        INSTALL_MOD_PATH=${MODULES_STAGING_DIR}                \
                        INSTALL_MOD_DIR="extra/${EXT_MOD}"                     \
@@ -620,7 +620,7 @@ if [ -n "${UNSTRIPPED_MODULES}" ]; then
   fi
 fi
 
-[ -n "${GKI_MODULES_LIST}" ] && cp ${ROOT_DIR}/${KERNEL_DIR}/${GKI_MODULES_LIST} ${DIST_DIR}/
+[ -n "${GKI_MODULES_LIST}" ] && cp ${KERNEL_DIR}/${GKI_MODULES_LIST} ${DIST_DIR}/
 
 echo "========================================================"
 echo " Files copied to ${DIST_DIR}"

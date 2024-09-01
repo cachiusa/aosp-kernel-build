@@ -274,13 +274,13 @@ else
   cp ${DIST_DIR}/${full_abi_out_file} ${DIST_DIR}/${abi_out_file}
 fi
 
-effective_kernel_dir=$(readlink -f ${ROOT_DIR}/${KERNEL_DIR})
+effective_kernel_dir=$(readlink -f ${KERNEL_DIR})
 for f in "$abi_out_file" "$full_abi_out_file"; do
   # sanitize the abi.xml by removing any occurrences of the kernel path
   # and also do that with any left over paths sneaking in
   # (e.g. from the prebuilts)
   sed -i -e "s#${effective_kernel_dir}/##g"   \
-         -e "s#${ROOT_DIR}/${KERNEL_DIR}/##g" \
+         -e "s#${KERNEL_DIR}/##g" \
          -e "s#${ROOT_DIR}/##g" "$DIST_DIR/$f"
   # Append debug information to abi file
   echo "

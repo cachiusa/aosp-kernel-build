@@ -67,9 +67,6 @@ if [ -z "${KERNEL_DIR}" ]; then
     #build_config_dir=${build_config_dir##${real_root_dir}}
     KERNEL_DIR="${build_config_dir}"
     echo " Set default KERNEL_DIR: ${KERNEL_DIR}"
-    if [ ${KERNEL_DIR} = ${ROOT_DIR} ]; then
-      KERNEL_DIR=.
-    fi
 else 
     echo " User environment KERNEL_DIR: ${KERNEL_DIR}"
 fi
@@ -129,7 +126,7 @@ export MODULES_ARCHIVE=modules.tar.gz
 export TZ=UTC
 export LC_ALL=C
 if [ -z "${SOURCE_DATE_EPOCH}" ]; then
-  export SOURCE_DATE_EPOCH=$(git -C ${ROOT_DIR}/${KERNEL_DIR} log -1 --pretty=%ct)
+  export SOURCE_DATE_EPOCH=$(git -C ${KERNEL_DIR} log -1 --pretty=%ct)
 fi
 kbuild_build_timestamp="$(date -d @${SOURCE_DATE_EPOCH})"
 export KBUILD_BUILD_TIMESTAMP=${KBUILD_BUILD_TIMESTAMP:-"$kbuild_build_timestamp"}
@@ -205,7 +202,7 @@ if [ "${HERMETIC_TOOLCHAIN:-0}" -eq 1 ]; then
 
   # use relative paths for file name references in the binaries
   # (e.g. debug info)
-  export KCPPFLAGS="-ffile-prefix-map=${ROOT_DIR}/${KERNEL_DIR}/= -ffile-prefix-map=${ROOT_DIR}/="
+  export KCPPFLAGS="-ffile-prefix-map=${KERNEL_DIR}/= -ffile-prefix-map=${ROOT_DIR}/="
 
   # set the common sysroot
   sysroot_flags+="--sysroot=${ROOT_DIR}/build/kernel/build-tools/sysroot "
