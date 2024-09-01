@@ -125,11 +125,13 @@ export MODULES_ARCHIVE=modules.tar.gz
 
 export TZ=UTC
 export LC_ALL=C
-if [ -z "${SOURCE_DATE_EPOCH}" ]; then
+if [ -z "${SOURCE_DATE_EPOCH}" ] && [ -d "${KERNEL_DIR}/.git" ]; then
   export SOURCE_DATE_EPOCH=$(git -C ${KERNEL_DIR} log -1 --pretty=%ct)
+  kbuild_build_timestamp="$(date -d @${SOURCE_DATE_EPOCH})"
 fi
-kbuild_build_timestamp="$(date -d @${SOURCE_DATE_EPOCH})"
-export KBUILD_BUILD_TIMESTAMP=${KBUILD_BUILD_TIMESTAMP:-"$kbuild_build_timestamp"}
+if [ -z "${KBUILD_BUILD_TIMESTAMP}" ] && [ -n "${SOURCE_DATE_EPOCH}" ]; then
+  export KBUILD_BUILD_TIMESTAMP="$kbuild_build_timestamp"
+fi
 export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-build-host}
 export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-build-user}
 export KBUILD_BUILD_VERSION=${KBUILD_BUILD_VERSION:-1}
