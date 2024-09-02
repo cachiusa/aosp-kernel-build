@@ -64,6 +64,10 @@ if [ -z "${KERNEL_DIR}" ]; then
     build_config_dir=${build_config_dir##${ROOT_DIR}/}
     build_config_dir=${build_config_dir##${real_root_dir}}
     KERNEL_DIR="${build_config_dir}"
+    if [[ "${ROOT_DIR}" == "${KERNEL_DIR}" ]]; then
+        # For backwards compatibility
+        KERNEL_DIR=.
+    fi
     echo "= Set default KERNEL_DIR: ${KERNEL_DIR}"
 else
     echo "= User environment KERNEL_DIR: ${KERNEL_DIR}"
