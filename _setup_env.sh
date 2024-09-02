@@ -123,10 +123,10 @@ if [ -z "${SOURCE_DATE_EPOCH}" ]; then
   echo "WARNING: Unable to determine SOURCE_DATE_EPOCH for ${KERNEL_DIR}, fallback to 0" >&2
   export SOURCE_DATE_EPOCH=0
 fi
-export KBUILD_BUILD_TIMESTAMP="$(date -d @${SOURCE_DATE_EPOCH})"
-export KBUILD_BUILD_HOST=build-host
-export KBUILD_BUILD_USER=build-user
-export KBUILD_BUILD_VERSION=1
+export KBUILD_BUILD_TIMESTAMP=${KBUILD_BUILD_TIMESTAMP:-"$(date -d @${SOURCE_DATE_EPOCH})"}
+export KBUILD_BUILD_HOST=${KBUILD_BUILD_HOST:-build-host}
+export KBUILD_BUILD_USER=${KBUILD_BUILD_USER:-build-user}
+export KBUILD_BUILD_VERSION=${KBUILD_BUILD_VERSION:-1}
 
 # List of prebuilt directories shell variables to incorporate into PATH
 prebuilts_paths=(
