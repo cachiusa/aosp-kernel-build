@@ -1038,3 +1038,20 @@ function kernelrelease() {
   cd ${OUT_DIR}
   echo "$VER$($REALROOTDIR/${KERNEL_DIR}/scripts/setlocalversion $REALROOTDIR/${KERNEL_DIR} ${BRANCH} ${KMI_GENERATION})"
 }
+
+# Check if any toolchain command is prefixed
+# $1 variable name
+# $2 variable value
+# $3 current arguments ($@)
+function check_tc() {
+  if echo "$2" | grep -q '[[:space:]]'; then
+    echo "error: variable $1 must not contain any prefixes or whitespaces"
+    echo "error: Run this command instead:"
+    echo
+    echo "    $0 $1='$2' ""$3"
+    printf "    $0 " | tr '[:print:]' ' '
+    printf "$1='$2'" | tr '[:print:]' '^'
+    echo "add this"
+    exit 1
+  fi
+}

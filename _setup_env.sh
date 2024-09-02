@@ -234,6 +234,7 @@ else
   fi
 
   if [ -n "${CC}" ]; then
+    check_tc CC "${CC}" "$@"
     tool_args+=("CC=${CC}")
     if [ -z "${HOSTCC}" ]; then
       tool_args+=("HOSTCC=${CC}")
@@ -241,14 +242,17 @@ else
   fi
 
   if [ -n "${LD}" ]; then
+    check_tc LD "${LD}" "$@"
     tool_args+=("LD=${LD}" "HOSTLD=${LD}")
   fi
 
   if [ -n "${NM}" ]; then
+    check_tc NM "${NM}" "$@"
     tool_args+=("NM=${NM}")
   fi
 
   if [ -n "${OBJCOPY}" ]; then
+    check_tc OBJCOPY "${OBJCOPY}" "$@"
     tool_args+=("OBJCOPY=${OBJCOPY}")
   fi
 fi
@@ -260,10 +264,12 @@ if [ -n "${LLVM_IAS}" ]; then
 fi
 
 if [ -n "${DEPMOD}" ]; then
+  check_tc DEPMOD "${DEPMOD}" "$@"
   tool_args+=("DEPMOD=${DEPMOD}")
 fi
 
 if [ -n "${DTC}" ]; then
+  check_tc DTC "${DTC}" "$@"
   tool_args+=("DTC=${DTC}")
 fi
 

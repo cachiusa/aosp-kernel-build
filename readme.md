@@ -28,7 +28,11 @@ OUT_DIR=output DIST_DIR=dist build/build.sh -j24 V=1
 ```shellscript
 BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh -j24 V=1
 ```
-
+To use a CC wrapper:
+```
+build/build.sh CC='ccache clang'
+```
+      
 ## config.sh
 Runs a configuration editor inside kernel/build environment.   
 Usage:  
