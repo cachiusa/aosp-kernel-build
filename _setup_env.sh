@@ -64,6 +64,9 @@ if [ -z "${KERNEL_DIR}" ]; then
     build_config_dir=${build_config_dir##${ROOT_DIR}/}
     build_config_dir=${build_config_dir##${real_root_dir}}
     KERNEL_DIR="${build_config_dir}"
+    echo "= Set default KERNEL_DIR: ${KERNEL_DIR}"
+else
+    echo "= User environment KERNEL_DIR: ${KERNEL_DIR}"
 fi
 
 set -a
@@ -72,6 +75,8 @@ for fragment in ${BUILD_CONFIG_FRAGMENTS}; do
   . ${ROOT_DIR}/${fragment}
 done
 set +a
+
+echo "= The final value for KERNEL_DIR: ${KERNEL_DIR}"
 
 # For incremental kernel development, it is beneficial to trade certain
 # optimizations for faster builds.
@@ -90,6 +95,10 @@ export DIST_DIR=$(readlink -m ${DIST_DIR:-${COMMON_OUT_DIR}/dist})
 export UNSTRIPPED_DIR=${DIST_DIR}/unstripped
 export UNSTRIPPED_MODULES_ARCHIVE=unstripped_modules.tar.gz
 export MODULES_ARCHIVE=modules.tar.gz
+
+echo "========================================================"
+echo "= build config: ${ROOT_DIR}/${BUILD_CONFIG}"
+cat ${ROOT_DIR}/${BUILD_CONFIG}
 
 export TZ=UTC
 export LC_ALL=C
@@ -156,6 +165,10 @@ for prebuilt_bin in "${prebuilts_paths[@]}"; do
     fi
 done
 export PATH
+
+echo
+echo "PATH=${PATH}"
+echo
 
 unset PYTHONPATH
 unset PYTHONHOME
