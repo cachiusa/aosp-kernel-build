@@ -73,13 +73,13 @@ function menuconfig() {
   if [ -z "${FRAGMENT_CONFIG}" ]; then
     (cd ${KERNEL_DIR} && make ${TOOL_ARGS} O=${OUT_DIR} ${MAKE_ARGS} savedefconfig)
     [ "$ARCH" = "x86_64" -o "$ARCH" = "i386" ] && local ARCH=x86
-    echo "Updating ${ROOT_DIR}/${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG}"
-    mv ${OUT_DIR}/defconfig ${ROOT_DIR}/${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG}
+    echo "Updating ${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG}"
+    mv ${OUT_DIR}/defconfig ${KERNEL_DIR}/arch/${ARCH}/configs/${DEFCONFIG}
     return
   fi
 
   ${KERNEL_DIR}/scripts/diffconfig -m ${orig_config} ${new_config} > ${changed_config}
-  KCONFIG_CONFIG=${new_fragment} ${ROOT_DIR}/${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m ${FRAGMENT_CONFIG} ${changed_config}
+  KCONFIG_CONFIG=${new_fragment} ${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m ${FRAGMENT_CONFIG} ${changed_config}
   sort_config ${new_fragment} > ${FRAGMENT_CONFIG}
   set +x
 

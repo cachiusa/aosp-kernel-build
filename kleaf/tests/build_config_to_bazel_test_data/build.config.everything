@@ -1,9 +1,9 @@
 DEVICE_KERNEL_DIR=${KERNEL_DIR}
 KERNEL_DIR=common
 
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.common
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.gki
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.aarch64
+. ${KERNEL_DIR}/build.config.common
+. ${KERNEL_DIR}/build.config.gki
+. ${KERNEL_DIR}/build.config.aarch64
 
 BUILD_CONFIG_FRAGMENTS=${DEVICE_KERNEL_DIR}/build.config.fragment
 FAST_BUILD=1
