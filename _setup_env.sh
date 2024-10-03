@@ -107,6 +107,39 @@ cat ${ROOT_DIR}/${BUILD_CONFIG}
 echo -e "\n=== end: ${ROOT_DIR}/${BUILD_CONFIG}"
 echo "========================================================"
 
+# Print all other configs referenced in main build config
+function lsconfig() {
+  set +e
+  local buildcfg=$1 # main build config
+  local depth=${2:-1} # recursive search
+
+  grepcfg() { 
+    eval echo $(grep -E '^\.\ ' "$1" | sed 's/. //g')
+  }
+
+  extra_configs="$(grepcfg "$buildcfg")"
+  [ -z "$extra_configs" ] && return
+
+  while [ "$depth" -gt 1 ]; do 
+    for i in $extra_configs; do
+      subcfg="$(grepcfg "$i")"
+      if [[ -n "$subcfg" ]] && [[ "$extra_configs" != *"$subcfg"* ]]; then
+        extra_configs="$extra_configs $subcfg"
+      fi
+    done
+    ((depth--))
+  done
+
+  echo $extra_configs
+  set -e
+}
+
+for fragment in $(lsconfig "${ROOT_DIR}/${BUILD_CONFIG}" 2); do
+  echo -e "=== Build config: $fragment\n"
+  cat "$fragment"
+  echo -e "\n=== end: $fragment"
+done
+
 export TZ=UTC
 export LC_ALL=C
 if [ -z "${SOURCE_DATE_EPOCH}" ]; then
